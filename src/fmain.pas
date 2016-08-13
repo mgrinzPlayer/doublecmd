@@ -819,6 +819,7 @@ type
     procedure ConfigSaveSettings;
     function  IsCommandLineVisible: Boolean;
     procedure ShowDrivesList(APanel: TFilePanelSelect);
+    function  GetDrivesListPointFromActiveFile(var point: TPoint ) : Boolean;
     procedure ExecuteCommandLine(bRunInTerm: Boolean);
     procedure UpdatePrompt;
     procedure UpdateFreeSpace(Panel: TFilePanelSelect);
@@ -865,7 +866,8 @@ uses
   uShellExecute, fSymLink, fHardLink, uExceptions, uUniqueInstance, Clipbrd, ShellCtrls,
   uFileSourceOperationOptionsUI, uDebug, uHotkeyManager, uFileSourceUtil, uTempFileSystemFileSource,
   Laz2_XMLRead, DCOSUtils, DCStrUtils, fOptions, fOptionsFrame, fOptionsToolbar, uClassesEx,
-  uHotDir, uFileSorting, DCBasicTypes, foptionsDirectoryHotlist, uConnectionManager
+  uHotDir, uFileSorting, DCBasicTypes, foptionsDirectoryHotlist, uConnectionManager, uOrderedFileView
+
   {$IFDEF COLUMNSFILEVIEW_VTV}
   , uColumnsFileViewVtv
   {$ELSE}
@@ -5635,6 +5637,20 @@ begin
   end;
 end;
 
+function TfrmMain.GetDrivesListPointFromActiveFile(var point: TPoint ) : Boolean;
+var
+  rect : TRect;
+begin
+  result:=false;
+  if (ActiveFrame is TOrderedFileView) then
+  begin
+    rect:= (ActiveFrame as TOrderedFileView).GetActiveFileRect;
+    point := Classes.Point(rect.Left + round((rect.Right - rect.Left) * 0.2), rect.Top);
+    point := ActiveFrame.ClientToScreen(point);
+    result:=true;
+  end
+end;
+
 procedure TfrmMain.ShowDrivesList(APanel: TFilePanelSelect);
 var
   p: TPoint;
@@ -5642,21 +5658,23 @@ var
 begin
   if tb_activate_panel_on_click in gDirTabOptions then
     SetActiveFrame(APanel);
-
-  case APanel of
-    fpLeft:
-      begin
-        p := Classes.Point(btnLeftDrive.Left, btnLeftDrive.Height);
-        p := pnlLeftTools.ClientToScreen(p);
-        ADriveIndex := btnLeftDrive.Tag;
+    if (GetDrivesListPointFromActiveFile(p) = false) then
+    begin
+      case APanel of
+        fpLeft:
+          begin
+          p := Classes.Point(btnLeftDrive.Left, btnLeftDrive.Height);
+            p := pnlLeftTools.ClientToScreen(p);
+            ADriveIndex := btnLeftDrive.Tag;
+          end;
+        fpRight:
+          begin
+            p := Classes.Point(btnRightDrive.Left, btnRightDrive.Height);
+            p := pnlRightTools.ClientToScreen(p);
+            ADriveIndex := btnRightDrive.Tag;
+          end;
       end;
-    fpRight:
-      begin
-        p := Classes.Point(btnRightDrive.Left, btnRightDrive.Height);
-        p := pnlRightTools.ClientToScreen(p);
-        ADriveIndex := btnRightDrive.Tag;
-      end;
-  end;
+    end;
   p := ScreenToClient(p);
   FDrivesListPopup.Show(p, APanel, ADriveIndex);
 end;
