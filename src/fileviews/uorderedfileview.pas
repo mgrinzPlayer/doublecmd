@@ -99,6 +99,7 @@ type
     procedure CloneTo(AFileView: TFileView); override;
     procedure SetActiveFile(aFilePath: String); override; overload;
     procedure ChangePathAndSetActiveFile(aFilePath: String); override; overload;
+    function  GetActiveFileRect: TRect;
 
   published  // commands
     procedure cm_QuickSearch(const Params: array of string);
@@ -722,6 +723,11 @@ begin
 
       FRangeSelectionEndIndex := FileIndex;
     end;
+end;
+
+function TOrderedFileView.GetActiveFileRect: TRect;
+begin
+	Result:= GetFileRect(GetActiveFileIndex);
 end;
 
 procedure TOrderedFileView.SetActiveFile(aFilePath: String);
