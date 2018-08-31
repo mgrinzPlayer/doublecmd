@@ -1,5 +1,5 @@
 
-# Double commander ![alt text](http://doublecmd.sourceforge.net/site/eng/top_frame_images/logo.png "Double commander")  
+# Double commander ![logo](https://doublecmd.sourceforge.io/site/images/logo.png "Double commander")  
 
 **A twin panel (side by side) cross platform open source file manager.**  
 
